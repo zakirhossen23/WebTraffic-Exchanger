@@ -1,0 +1,218 @@
+﻿<Page
+    x:Class="WebTraffic_Exchanger.login.Login"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:hc="https://handyorg.github.io/handycontrol"
+    xmlns:local="clr-namespace:WebTraffic_Exchanger.login"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="Login"
+    MinWidth="1200"
+    MinHeight="350"
+    mc:Ignorable="d">
+
+    <Grid HorizontalAlignment="Center" Background="White">
+
+        <StackPanel
+            Margin="0,10,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Center">
+            <Border
+                Width="500"
+                Height="400"
+                BorderBrush="Black"
+                BorderThickness="1,1,1,1"
+                CornerRadius="30,30,30,30">
+                <Border.Background>
+                    <ImageBrush ImageSource="/WebTraffic Exchanger;component/Assets/login-back.png" />
+                </Border.Background>
+
+                <Grid
+                    Width="500"
+                    Height="400"
+                    Margin="10,10">
+                    <Label
+                        Width="275"
+                        Height="100"
+                        Margin="0,50,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Background="Transparent"
+                        BorderBrush="Transparent"
+                        Content="WEB TRAFFIC&#xA;EXCHANGER"
+                        FontSize="30"
+                        Foreground="White" />
+                    <Canvas Name="canvas" Margin="0,36,0,0">
+                        <Ellipse
+                            Canvas.Left="40"
+                            Canvas.Top="180"
+                            Width="15"
+                            Height="15"
+                            Fill="White" />
+                        <Ellipse
+                            Canvas.Left="40"
+                            Canvas.Top="220"
+                            Width="15"
+                            Height="15"
+                            Fill="White" />
+                        <Ellipse
+                            Canvas.Left="40"
+                            Canvas.Top="260"
+                            Width="15"
+                            Height="15"
+                            Fill="White" />
+                    </Canvas>
+                    <Label
+                        Margin="55,203,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Background="Transparent"
+                        BorderBrush="Transparent"
+                        Content="Boost your website's traffic"
+                        FontSize="20"
+                        Foreground="White" />
+                    <Label
+                        Margin="55,243,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Background="Transparent"
+                        BorderBrush="Transparent"
+                        Content="Improve your ranking"
+                        FontSize="20"
+                        Foreground="White" />
+                    <Label
+                        Margin="55,283,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Background="Transparent"
+                        BorderBrush="Transparent"
+                        Content="Easy to use"
+                        FontSize="20"
+                        Foreground="White" />
+
+                </Grid>
+            </Border>
+        </StackPanel>
+        <StackPanel
+            Margin="520,10,0,0"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Center">
+            <Border
+                Width="450"
+                Height="400"
+                Background="White"
+                BorderBrush="Black"
+                BorderThickness="1,1,1,1"
+                CornerRadius="30,30,30,30">
+
+                <StackPanel Margin="10,10">
+                    <Label
+                        Margin="10,50,0,20"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Background="Transparent"
+                        BorderBrush="Transparent"
+                        Content="SIGN IN TO YOUR ACOUNT"
+                        FontSize="25"
+                        Foreground="Black" />
+
+                    <StackPanel Width="382">
+                        <Border
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            CornerRadius="4">
+                            <Grid>
+                                <hc:TextBox
+                                    x:Name="usernameTXT"
+                                    Height="40"
+                                    Margin="1"
+                                    HorizontalAlignment="Stretch"
+                                    hc:InfoElement.Placeholder="Username or Email Address"
+                                    FontSize="20"
+                                    Foreground="Black" />
+                            </Grid>
+
+                        </Border>
+
+                    </StackPanel>
+
+                    <StackPanel Width="382" Margin="0,0,0,0">
+                        <Border
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            CornerRadius="4">
+                            <Grid>
+                                <hc:PasswordBox
+                                    x:Name="passwordTXT"
+                                    Height="40"
+                                    Margin="1"
+                                    HorizontalAlignment="Stretch"
+                                    hc:InfoElement.Placeholder="Password"
+                                    BorderThickness="1"
+                                    FontSize="20"
+                                    Foreground="Black"
+                                    PasswordChar="*"
+                                    ShowEyeButton="True" />
+                            </Grid>
+
+                        </Border>
+
+                    </StackPanel>
+
+
+                    <Grid Width="382" Margin="10,20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="383*" />
+                            <ColumnDefinition Width="25*" />
+                        </Grid.ColumnDefinitions>
+                        <CheckBox
+                            Name="remembermeCheck"
+                            Grid.Row="0"
+                            Grid.ColumnSpan="2"
+                            Margin="0,5,0,0"
+                            HorizontalAlignment="Left"
+                            Content="Remember me"
+                            Cursor="Hand"
+                            FontSize="15" />
+                        <Label
+                            Grid.Row="0"
+                            Grid.ColumnSpan="2"
+                            Margin="0,0,0,0"
+                            HorizontalAlignment="Right"
+                            BorderBrush="Transparent"
+                            Content="Forgot Password?"
+                            Cursor="Hand"
+                            FontSize="15"
+                            MouseDown="Label_MouseDown" />
+                    </Grid>
+
+                    <Grid Width="382" Margin="10,20">
+                        <Button
+                            x:Name="LoginBTN"
+                            Width="150"
+                            Height="40"
+                            Padding="5"
+                            HorizontalAlignment="Left"
+                            Content="SIGN IN"
+                            Cursor="Hand"
+                            FontSize="20"
+                            Style="{StaticResource ButtonInfo}" Click="LoginBTN_Click" />
+                        <Label
+                            Name="signup"
+                            Grid.Row="0"
+                            Grid.ColumnSpan="2"
+                            HorizontalAlignment="Right"
+                            BorderBrush="Transparent"
+                            Content="New here? Sign up"
+                            Cursor="Hand"
+                            FontSize="15"
+                            MouseDown="Signup_MouseDown" />
+
+                    </Grid>
+
+                </StackPanel>
+            </Border>
+        </StackPanel>
+
+    </Grid>
+</Page>
