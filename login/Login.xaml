@@ -193,10 +193,11 @@
                             Height="40"
                             Padding="5"
                             HorizontalAlignment="Left"
+                            Click="LoginBTN_ClickAsync"
                             Content="SIGN IN"
                             Cursor="Hand"
                             FontSize="20"
-                            Style="{StaticResource ButtonInfo}" Click="LoginBTN_Click" />
+                            Style="{StaticResource ButtonInfo}" />
                         <Label
                             Name="signup"
                             Grid.Row="0"

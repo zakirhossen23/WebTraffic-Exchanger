@@ -1,6 +1,8 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -12,6 +14,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Text.Json;
+using Newtonsoft.Json.Linq;
 
 namespace WebTraffic_Exchanger.login
 {
@@ -20,6 +24,7 @@ namespace WebTraffic_Exchanger.login
     /// </summary>
     public partial class Login : Page
     {
+       
         public Login()
         {
             InitializeComponent();
@@ -35,8 +40,17 @@ namespace WebTraffic_Exchanger.login
             System.Diagnostics.Process.Start("http://webtraffic.live/register");
         }
 
-        private void LoginBTN_Click(object sender, RoutedEventArgs e)
+        private async void LoginBTN_ClickAsync(object sender, RoutedEventArgs e)
         {
+
+            classes.GetPost getpost = new classes.GetPost();
+            var parsed = await getpost.Post("{\n\t\"email\":\"zakiristesting@gmail.com\",\n\t\"password\":\"zakir%%$\"\n\t\n}", "http://webtraffic.live/api/login");
+            int authid = int.Parse(parsed.SelectToken("id").ToString());
+            Properties.Settings.Default.Authid = authid;
+            Properties.Settings.Default.logged = true;
+
+            Properties.Settings.Default.Save();
+         
 
         }
     }

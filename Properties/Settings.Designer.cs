@@ -34,5 +34,17 @@ namespace WebTraffic_Exchanger.Properties {
                 this["Authid"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool logged {
+            get {
+                return ((bool)(this["logged"]));
+            }
+            set {
+                this["logged"] = value;
+            }
+        }
     }
 }
