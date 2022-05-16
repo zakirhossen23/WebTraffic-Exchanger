@@ -29,5 +29,20 @@ namespace WebTraffic_Exchanger.classes
             }
 
         }
+
+        public async Task<JToken> GetbyQuery(String url)
+        {
+         
+            using (var client = new HttpClient())
+            {
+                var response = await client.GetAsync(url);
+                string result = response.Content.ReadAsStringAsync().Result;
+                var parsed = JObject.Parse(result);
+                return parsed;
+            }
+
+        }
+
+
     }
 }

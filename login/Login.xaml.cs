@@ -27,6 +27,10 @@ namespace WebTraffic_Exchanger.login
        
         public Login()
         {
+            if (Properties.Settings.Default.logged == true)
+            {
+                CloseAndMain();
+            }
             InitializeComponent();
         }
 
@@ -42,16 +46,31 @@ namespace WebTraffic_Exchanger.login
 
         private async void LoginBTN_ClickAsync(object sender, RoutedEventArgs e)
         {
-
-            classes.GetPost getpost = new classes.GetPost();
-            var parsed = await getpost.Post("{\n\t\"email\":\"zakiristesting@gmail.com\",\n\t\"password\":\"zakir%%$\"\n\t\n}", "http://webtraffic.live/api/login");
+            try
+            {
+ classes.GetPost getpost = new classes.GetPost();
+            var parsed = await getpost.Post("{\n\t\"email\":\""+ usernameTXT.Text+ "\",\n\t\"password\":\""+ passwordTXT.Password + "\"\n\t\n}", "http://webtraffic.live/api/login");
             int authid = int.Parse(parsed.SelectToken("id").ToString());
             Properties.Settings.Default.Authid = authid;
             Properties.Settings.Default.logged = true;
 
             Properties.Settings.Default.Save();
-         
+                CloseAndMain();
+            }
+            catch (Exception ex)
+            {
 
+            }          
+
+        }
+
+
+        private void CloseAndMain()
+        {
+            var w = Application.Current.Windows[0];
+            w.Hide();
+            Main.Main main = new Main.Main();
+            main.ShowDialog();
         }
     }
 }
