@@ -28,6 +28,7 @@
                                 VerticalAlignment="Center"
                                 Text="Proxy IP" />
                             <hc:TextBox
+                                Name="proxyTXT"
                                 Width="180"
                                 Margin="5,5"
                                 HorizontalAlignment="Left"
@@ -39,8 +40,9 @@
                                 Margin="5,0"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Center"
-                                Text="Password" />
+                                Text="Port" />
                             <hc:TextBox
+                                Name="ProxyPortTXT"
                                 Width="180"
                                 Margin="5,5"
                                 HorizontalAlignment="Left"
@@ -53,6 +55,7 @@
                             Margin="0,5,0,5"
                             Padding="5"
                             HorizontalAlignment="Left"
+                            Click="addProxyBTN_Click"
                             Content="Add Proxy"
                             Cursor="Hand"
                             FontSize="13"

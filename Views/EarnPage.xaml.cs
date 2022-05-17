@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using SetProxy;
 
 namespace WebTraffic_Exchanger.Views
 {
@@ -37,7 +38,6 @@ namespace WebTraffic_Exchanger.Views
 
         private async void SurfBTN_Click_1(object sender, RoutedEventArgs e)
         {
-
             openWindow(false);
             startKeepcheck();
         }
@@ -82,7 +82,6 @@ namespace WebTraffic_Exchanger.Views
                 {
                     this.timeleft.Text = website.duration.ToString();
                 });
-              
             }
             else
             {               
@@ -105,6 +104,12 @@ namespace WebTraffic_Exchanger.Views
           
         }
 
-
+        private void addProxyBTN_Click(object sender, RoutedEventArgs e)
+        {
+            WinInetInterop.SetConnectionProxy(String.Format("{0}:{1}", this.proxyTXT.Text.Trim(),this.ProxyPortTXT.Text.Trim()));
+            browsing = new Browser.browserWin();
+            
+            browsing.Show("https://www.what-is-my-ipv4.com/en");
+        }
     }
 }

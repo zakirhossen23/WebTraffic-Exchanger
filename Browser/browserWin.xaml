@@ -11,10 +11,9 @@
     Height="450"
     mc:Ignorable="d">
     <Grid>
-        <wpf:ChromiumWebBrowser
+        <WebBrowser
             x:Name="wbMain"
             Grid.Row="1"
-            Grid.ColumnSpan="2"
-            Address="http://webtraffic.live/dashboard" />
+            Grid.ColumnSpan="2" />
     </Grid>
 </Window>
