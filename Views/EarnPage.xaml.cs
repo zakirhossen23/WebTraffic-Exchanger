@@ -37,6 +37,7 @@ namespace WebTraffic_Exchanger.Views
 
         private async void SurfBTN_Click_1(object sender, RoutedEventArgs e)
         {
+            this.SurfBTN.IsEnabled = false;
             openWindow(false);
             startKeepcheck();
         }
@@ -87,7 +88,7 @@ namespace WebTraffic_Exchanger.Views
                
                 this.Dispatcher.Invoke(() =>
                 {
-                    earnedTXT.Text = String.Format("+{0} earned!", website.credits.ToString());
+                    earnedTXT.Text = String.Format("+{0} credit(s)!", website.credits.ToString());
                     showEarnedTXT.IsChecked = false;
                     showEarnedTXT.IsChecked = true;
                     this.timeleft.Text ="0";
@@ -108,6 +109,7 @@ namespace WebTraffic_Exchanger.Views
                     MessageBox.Show("Closed window!");
                     this.Dispatcher.Invoke(() =>
                     {
+                        this.SurfBTN.IsEnabled = true;
                         this.timeleft.Text = "0";
                     });
 
