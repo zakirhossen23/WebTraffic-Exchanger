@@ -108,6 +108,7 @@
       <DependentUpon>browserWin.xaml</DependentUpon>
     </Compile>
     <Compile Include="classes\SetProxy.cs" />
+    <Compile Include="Datas\User.cs" />
     <Compile Include="Datas\Website.cs" />
     <Compile Include="RelayCommand.cs" />
     <Compile Include="Views\EarnPage.xaml.cs">

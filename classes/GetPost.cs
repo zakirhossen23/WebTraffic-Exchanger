@@ -21,11 +21,16 @@ namespace WebTraffic_Exchanger.classes
             {
                 var response = await client.PostAsync(url, data);
                 string result = response.Content.ReadAsStringAsync().Result;
-                var parsed = JObject.Parse(result);
+
+                JToken parsed = null;
+                    try
+                {
+                    parsed= JObject.Parse(result);
                 return parsed;
-                int authid = int.Parse(parsed.SelectToken("id").ToString());
-                Properties.Settings.Default.Authid = authid;
-                Properties.Settings.Default.Save();
+                }catch(Exception ex) { }
+                return parsed;
+
+
             }
 
         }
@@ -42,7 +47,6 @@ namespace WebTraffic_Exchanger.classes
             }
 
         }
-
 
     }
 }

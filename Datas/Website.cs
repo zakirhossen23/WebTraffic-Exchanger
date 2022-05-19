@@ -12,6 +12,7 @@ namespace WebTraffic_Exchanger.Datas
 
         public Website(JToken JSONSTRING)
         {
+            this.id = int.Parse(JSONSTRING.SelectToken("id").ToString());
             this.user_id = int.Parse(JSONSTRING.SelectToken("user_id").ToString());
             this.url = JSONSTRING.SelectToken("url").ToString();
             this.credits = int.Parse(JSONSTRING.SelectToken("credits").ToString());
@@ -20,8 +21,9 @@ namespace WebTraffic_Exchanger.Datas
             this.totalhits = int.Parse(JSONSTRING.SelectToken("totalhits").ToString());
             this.hits = int.Parse(JSONSTRING.SelectToken("hits").ToString());
             this.status = int.Parse(JSONSTRING.SelectToken("status").ToString());
-        } 
+        }
 
+        public int id { get; set; }
         public int user_id { get; set; }
         public String url { get; set; }
         public int credits { get; set; }

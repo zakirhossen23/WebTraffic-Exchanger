@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -43,6 +44,7 @@ namespace WebTraffic_Exchanger.Views
         List<string> allUserAgetnt = new List<string>();
         private async void SurfBTN_Click(object sender, RoutedEventArgs e)
         {
+            SurfBTN.IsEnabled = false;
             var client = new WebClient();
 
             string xml = await client.DownloadStringTaskAsync("https://techpatterns.com/downloads/firefox/useragentswitcher.xml");
@@ -52,7 +54,7 @@ namespace WebTraffic_Exchanger.Views
             {
                 while (finished == false)
                 {
-                    if (current == threadTXT.Value)
+                    if (current == WebsiteGrid.Items.Count)
                     {
                         finished = true;
                     }
@@ -62,19 +64,18 @@ namespace WebTraffic_Exchanger.Views
                 var obj = (Proxy)ProxyGrid.Items[x];
                 WinInetInterop.SetConnectionProxy(obj.proxy);
 
-                for (int i = 0; i < threadTXT.Value; i++)
+                for (int i = 0; i < WebsiteGrid.Items.Count; i++)
                 {
                     current = 0;
                     finished = false;
                     System.Windows.Forms.WebBrowser webBrowser = new System.Windows.Forms.WebBrowser();
                     webBrowser.ScriptErrorsSuppressed = true;
                     String useragent = "User-Agent: " + allUserAgetnt[i];
-                    webBrowser.Navigate(websiteTXT.Text, null, null, useragent);
+                    webBrowser.Navigate(((Website)WebsiteGrid.Items[i]).Name, null, null, useragent);
                     webBrowser.DocumentCompleted += (seder, ex) => Random_click(webBrowser);
                 }
-
             }
-
+            SurfBTN.IsEnabled = true;
         }
 
 
@@ -89,12 +90,9 @@ namespace WebTraffic_Exchanger.Views
                     if (el.GetAttribute("href") != "" && !el.GetAttribute("href").Contains("#"))
                     {
                         totalHitsTXT.Text = (int.Parse(totalHitsTXT.Text) + 1).ToString();
-                        el.InvokeMember("Click");
-                        
+                        el.InvokeMember("Click");                        
                         break;
                     }
-
-
                 }
             } catch (Exception ex)
             { }
@@ -104,37 +102,36 @@ namespace WebTraffic_Exchanger.Views
 
         private void addWebsiteBTN_Click(object sender, RoutedEventArgs e)
         {
-            WebsiteGrid.Items.Add(new Website() { ID = WebsiteGrid.Items.Count, Name = websiteTXT.Text }) ;
+            WebsiteGrid.Items.Add(new Website() { ID = WebsiteGrid.Items.Count, Name = websiteTXT.Text });
             websiteTXT.Text = "";
         }
 
-        private void addProxyBTN_Click(object sender, RoutedEventArgs e)
-        {
-            ProxyGrid.Items.Add(new Proxy() { ID = ProxyGrid.Items.Count, proxy = String.Format("{0}:{1}", this.proxyTXT.Text.Trim(), this.ProxyPortTXT.Text.Trim()) });
-            proxyTXT.Text = "";
-            ProxyPortTXT.Text = "";
-        }
 
-        private void openTxtBTN_Click(object sender, RoutedEventArgs e)
+        private async void LoadProxyBTN_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog theDialog = new OpenFileDialog();
-            theDialog.Title = "Open Text File";
-            theDialog.Filter = "TXT files|*.txt";
-            theDialog.InitialDirectory = @"C:\";
-            if (theDialog.ShowDialog() == DialogResult.OK)
+            LoadProxyBTN.IsEnabled = false;
+            var url = "https://api.proxyscrape.com/v2/account/datacenter_shared/proxy-list?auth=exrabwwjri9qbck50dqn&type=getproxies&country[]=all&protocol=http&format=normal&status=online";
+
+            var httpRequest =  (HttpWebRequest)WebRequest.Create(url);
+
+            var httpResponse =await httpRequest.GetResponseAsync();
+            using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
             {
-                string filename = theDialog.FileName;
-
-                string[] filelines = File.ReadAllLines(filename);
-                
-                for (int i = 0; i< filelines.Length; i++)
+                var result = streamReader.ReadToEnd();
+                string[] alllines = Regex.Split(result, @"\r?\n|\r");
+                for (int i = 0; i < alllines.Length; i++)
                 {
-                    ProxyGrid.Items.Add(new Proxy() { ID = ProxyGrid.Items.Count, proxy = filelines[i]});
-                    
-                }
+                    if (alllines[i] != "")
+                    {
+                        ProxyGrid.Items.Add(new Proxy() { ID = ProxyGrid.Items.Count, proxy = alllines[i] });
+                    }                   
 
-                Console.WriteLine(filelines);
+                }
+                LoadProxyBTN.IsEnabled = true;
             }
+
+            
+
         }
     }
     class Website{
@@ -199,7 +196,7 @@ namespace WebTraffic_Exchanger.Views
         }
        
         
-        private string _status;
+        private string _status ="online";
         public string status
         {
             get

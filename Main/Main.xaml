@@ -6,12 +6,15 @@
     xmlns:hc="https://handyorg.github.io/handycontrol"
     xmlns:local="clr-namespace:WebTraffic_Exchanger.Main"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Title="Main"
+    Title="WebTraffic Exchanger"
     Width="800"
     Height="450"
     Closing="Window_Closing"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
+    <Window.Resources>
+        <hc:String2VisibilityConverter x:Key="String2VisibilityConverter" />
+    </Window.Resources>
     <Grid>
 
         <Grid>
@@ -27,6 +30,7 @@
                     Margin="10,10,0,0"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Top"
+                    Checked="ToggleButton_Checked"
                     Content="&#xE700;"
                     FontFamily="Segoe MDL2 Assets"
                     IsChecked="{Binding IsOpen, ElementName=DrawerLeft}" />
@@ -55,7 +59,7 @@
                         <RowDefinition Height="*" />
                         <RowDefinition />
                     </Grid.RowDefinitions>
-                    <StackPanel Grid.Row="0">
+                    <Grid Grid.Row="0">
                         <StackPanel>
                             <TextBlock
                                 Margin="10,0,0,0"
@@ -63,6 +67,12 @@
                                 VerticalAlignment="Center"
                                 Style="{StaticResource TextBlockTitle}"
                                 Text="{Binding username, StringFormat='Hello, {0}'}" />
+                            <TextBlock
+                                Margin="8,5,0,0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Center"
+                                Foreground="Blue"
+                                Text="{Binding credits, StringFormat=' {0} credits'}" />
 
                         </StackPanel>
 
@@ -73,11 +83,11 @@
                             Command="hc:ControlCommands.Close"
                             Foreground="{DynamicResource PrimaryTextBrush}"
                             Style="{StaticResource ButtonIcon}" />
+                    </Grid>
 
-                    </StackPanel>
 
                     <StackPanel Grid.Row="1">
-                        <hc:SideMenu BorderThickness="1">
+                        <hc:SideMenu>
                             <hc:Interaction.Triggers>
                                 <hc:EventTrigger EventName="SelectionChanged">
                                     <hc:EventToCommand Command="{Binding SwitchItemCmd}" PassEventArgsToCommand="True" />
@@ -88,34 +98,43 @@
                                 Command="{Binding SelectCmd}"
                                 CommandParameter="{Binding Header, RelativeSource={RelativeSource Self}}"
                                 Header="Earn Credits"
-                                IsSelected="True"
                                 MouseDown="EarnBTN_MouseDown">
                                 <hc:SideMenuItem.Icon>
                                     <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8EE;" />
                                 </hc:SideMenuItem.Icon>
                             </hc:SideMenuItem>
-                            <hc:SideMenuItem
-                                Command="{Binding SelectCmd}"
-                                CommandParameter="{Binding Header, RelativeSource={RelativeSource Self}}"
-                                Header="Websites">
-                                <hc:SideMenuItem.Icon>
-                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="\&#xf246;" />
-                                </hc:SideMenuItem.Icon>
-                            </hc:SideMenuItem>
+
 
                             <hc:SideMenuItem
                                 Name="ProxySurfBTN"
                                 Command="{Binding SelectCmd}"
                                 CommandParameter="{Binding Header, RelativeSource={RelativeSource Self}}"
                                 Header="Proxy Surf"
-                                MouseDown="ProxySurfBTN_MouseDown">
+                                MouseDown="ProxySurfBTN_MouseDown"
+                                Visibility="{Binding userlevel}">
+
+
                                 <hc:SideMenuItem.Icon>
                                     <TextBlock FontFamily="Segoe MDL2 Assets" Text="\&#xE8EE;" />
                                 </hc:SideMenuItem.Icon>
-                            </hc:SideMenuItem>
-                        </hc:SideMenu>
 
+                            </hc:SideMenuItem>
+
+                        </hc:SideMenu>
                     </StackPanel>
+
+                    <Button
+                        x:Name="logoutBTN"
+                        Grid.Row="2"
+                        Width="50"
+                        Height="50"
+                        Margin="0,0,0,20"
+                        VerticalAlignment="Bottom"
+                        Click="logoutBTN_Click"
+                        Content="&#xE7E8;"
+                        FontFamily="Segoe MDL2 Assets"
+                        FontSize="20"
+                        Foreground="Red" />
                 </Grid>
             </Border>
         </hc:Drawer>

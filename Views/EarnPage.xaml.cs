@@ -56,7 +56,11 @@ namespace WebTraffic_Exchanger.Views
             classes.GetPost getpost = new classes.GetPost();
             var parsed = await getpost.GetbyQuery("http://webtraffic.live/api/session?userid=" + Properties.Settings.Default.Authid + "&getSite=1");
             Datas.Website website = new Datas.Website(parsed.SelectToken("website"));
-          if (changed == true)
+            this.Dispatcher.Invoke(() =>
+            {
+                this.timeleft.Text = website.duration.ToString();
+            });
+            if (changed == true)
             {
                 browsing.changeURL(website.url);
             }
@@ -72,7 +76,7 @@ namespace WebTraffic_Exchanger.Views
             surfTimer.Start();
         }
 
-        private void keepSurfing(Datas.Website website)
+        private async void keepSurfing(Datas.Website website)
         {
            
             if (website.duration > 1)
@@ -85,14 +89,20 @@ namespace WebTraffic_Exchanger.Views
             }
             else
             {
-               
+                classes.GetPost getpost = new classes.GetPost();
+                //Finished surf 1 website
+                 this.Dispatcher.Invoke(() => 
+                {  
+                    this.timeleft.Text ="0";                 
+                });
+                    var saved = await getpost.Post("{\n\t\"complete\":1,\n\t\"userid\": "+Properties.Settings.Default.Authid+",\n\t\"id\":"+website.id+"\n}", "http://webtraffic.live/api/session");
                 this.Dispatcher.Invoke(() =>
                 {
                     earnedTXT.Text = String.Format("+{0} credit(s)!", website.credits.ToString());
                     showEarnedTXT.IsChecked = false;
                     showEarnedTXT.IsChecked = true;
-                    this.timeleft.Text ="0";
                 });
+              
 
                 surfTimer.Close();
                 openWindow(true);

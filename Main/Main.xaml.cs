@@ -19,10 +19,20 @@ namespace WebTraffic_Exchanger.Main
     /// </summary>
     public partial class Main : Window
     {
+        Datas.User user;
         public Main()
         {
             InitializeComponent();
-            this.DataContext = new TextboxText() { username = "Test" };
+            GetUser();
+           
+        }
+        private async void GetUser()
+        {
+            classes.GetPost getpost = new classes.GetPost();
+            var parsed = await getpost.GetbyQuery("http://webtraffic.live/api/user?id=" + Properties.Settings.Default.Authid );
+             user = new Datas.User(parsed);
+
+            this.DataContext = new TextboxText() { username = user.username, credits =  user.credits, userlevel  = user.userlevel == 0?"Hidden":"Visible"};
         }
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
@@ -32,7 +42,8 @@ namespace WebTraffic_Exchanger.Main
         public class TextboxText
         {
             public string username { get; set; }
-
+            public float credits { get; set; }
+            public string userlevel { get; set; }
         }
 
         private void EarnBTN_MouseDown(object sender, MouseButtonEventArgs e)
@@ -45,6 +56,20 @@ namespace WebTraffic_Exchanger.Main
         {
             Views.ProxySurf proxypage = new Views.ProxySurf();
             PagesFrames.Navigate(proxypage);
+        }
+
+        private void logoutBTN_Click(object sender, RoutedEventArgs e)
+        {
+            Properties.Settings.Default.logged = false;
+            Properties.Settings.Default.Save();
+            var w = Application.Current.Windows[0]; 
+            this.Close();
+            w.Show();
+        }
+
+        private void ToggleButton_Checked(object sender, RoutedEventArgs e)
+        {
+            GetUser();
         }
     }
 }
