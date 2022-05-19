@@ -11,7 +11,7 @@
     Height="450"
     mc:Ignorable="d">
     <Grid>
-        <WebBrowser
+        <wpf:ChromiumWebBrowser
             x:Name="wbMain"
             Grid.Row="1"
             Grid.ColumnSpan="2" />

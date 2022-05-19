@@ -51,10 +51,11 @@
                 BorderThickness="0,1,0,0">
                 <Grid>
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="70" />
                         <RowDefinition Height="*" />
                         <RowDefinition />
                     </Grid.RowDefinitions>
-                    <StackPanel>
+                    <StackPanel Grid.Row="0">
                         <StackPanel>
                             <TextBlock
                                 Margin="10,0,0,0"
@@ -75,7 +76,7 @@
 
                     </StackPanel>
 
-                    <StackPanel Margin="0,100,0,0">
+                    <StackPanel Grid.Row="1">
                         <hc:SideMenu BorderThickness="1">
                             <hc:Interaction.Triggers>
                                 <hc:EventTrigger EventName="SelectionChanged">
@@ -102,6 +103,16 @@
                                 </hc:SideMenuItem.Icon>
                             </hc:SideMenuItem>
 
+                            <hc:SideMenuItem
+                                Name="ProxySurfBTN"
+                                Command="{Binding SelectCmd}"
+                                CommandParameter="{Binding Header, RelativeSource={RelativeSource Self}}"
+                                Header="Proxy Surf"
+                                MouseDown="ProxySurfBTN_MouseDown">
+                                <hc:SideMenuItem.Icon>
+                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text="\&#xE8EE;" />
+                                </hc:SideMenuItem.Icon>
+                            </hc:SideMenuItem>
                         </hc:SideMenu>
 
                     </StackPanel>

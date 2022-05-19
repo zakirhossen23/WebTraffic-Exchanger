@@ -27,7 +27,6 @@ namespace WebTraffic_Exchanger.Views
             InitializeComponent();
         }
 
-
         private void Button_Click(object sender, RoutedEventArgs e)
         {
 
@@ -84,7 +83,16 @@ namespace WebTraffic_Exchanger.Views
                 });
             }
             else
-            {               
+            {
+               
+                this.Dispatcher.Invoke(() =>
+                {
+                    earnedTXT.Text = String.Format("+{0} earned!", website.credits.ToString());
+                    showEarnedTXT.IsChecked = false;
+                    showEarnedTXT.IsChecked = true;
+                    this.timeleft.Text ="0";
+                });
+
                 surfTimer.Close();
                 openWindow(true);
             }
@@ -98,18 +106,16 @@ namespace WebTraffic_Exchanger.Views
                     surfTimer.Close();
                     timer.Close();
                     MessageBox.Show("Closed window!");
+                    this.Dispatcher.Invoke(() =>
+                    {
+                        this.timeleft.Text = "0";
+                    });
+
                 }
             }
             catch (Exception ex) { }
           
         }
 
-        private void addProxyBTN_Click(object sender, RoutedEventArgs e)
-        {
-            WinInetInterop.SetConnectionProxy(String.Format("{0}:{1}", this.proxyTXT.Text.Trim(),this.ProxyPortTXT.Text.Trim()));
-            browsing = new Browser.browserWin();
-            
-            browsing.Show("https://www.what-is-my-ipv4.com/en");
-        }
     }
 }

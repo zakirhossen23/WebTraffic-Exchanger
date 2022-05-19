@@ -85,6 +85,7 @@
     <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
     </Reference>
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -111,6 +112,12 @@
     <Compile Include="RelayCommand.cs" />
     <Compile Include="Views\EarnPage.xaml.cs">
       <DependentUpon>EarnPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ProxyCheck.xaml.cs">
+      <DependentUpon>ProxyCheck.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ProxySurf.xaml.cs">
+      <DependentUpon>ProxySurf.xaml</DependentUpon>
     </Compile>
     <Page Include="Browser\browserWin.xaml">
       <SubType>Designer</SubType>
@@ -141,6 +148,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\EarnPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ProxyCheck.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ProxySurf.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

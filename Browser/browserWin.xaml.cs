@@ -35,13 +35,13 @@ namespace WebTraffic_Exchanger.Browser
         {
             this.Dispatcher.Invoke(() =>
             {
-                this.wbMain.Navigate( url);
+                this.wbMain.Address=( url);
             });
             
         }
         public void Show(String url)
         {
-            this.wbMain.Navigate( url);
+            this.wbMain.Address =( url);
             this.Show();
         }
 

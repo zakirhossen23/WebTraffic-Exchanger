@@ -40,5 +40,11 @@ namespace WebTraffic_Exchanger.Main
             Views.EarnPage earnpage = new Views.EarnPage();
             PagesFrames.Navigate(earnpage);
         }
+
+        private void ProxySurfBTN_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            Views.ProxySurf proxypage = new Views.ProxySurf();
+            PagesFrames.Navigate(proxypage);
+        }
     }
 }
