@@ -19,6 +19,7 @@ using System.Windows.Shapes;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using SetProxy;
+using Microsoft.Win32;
 namespace WebTraffic_Exchanger.Views
 {
     /// <summary>
@@ -26,6 +27,8 @@ namespace WebTraffic_Exchanger.Views
     /// </summary>
     public partial class ProxySurf : Page
     {
+        RegistryKey reg_key;
+
         public ProxySurf()
         {
             InitializeComponent();
@@ -44,6 +47,8 @@ namespace WebTraffic_Exchanger.Views
         List<string> allUserAgetnt = new List<string>();
         private async void SurfBTN_Click(object sender, RoutedEventArgs e)
         {
+           reg_key = Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings", true);
+            reg_key.SetValue("ProxyEnable", 1);
             SurfBTN.IsEnabled = false;
             var client = new WebClient();
 
@@ -62,6 +67,7 @@ namespace WebTraffic_Exchanger.Views
                 }
                         
                 var obj = (Proxy)ProxyGrid.Items[x];
+                //reg_key.SetValue("ProxyServer", obj.proxy);
                 WinInetInterop.SetConnectionProxy(obj.proxy);
 
                 for (int i = 0; i < WebsiteGrid.Items.Count; i++)
@@ -124,8 +130,7 @@ namespace WebTraffic_Exchanger.Views
                     if (alllines[i] != "")
                     {
                         ProxyGrid.Items.Add(new Proxy() { ID = ProxyGrid.Items.Count, proxy = alllines[i] });
-                    }                   
-
+                    }    
                 }
                 LoadProxyBTN.IsEnabled = true;
             }
