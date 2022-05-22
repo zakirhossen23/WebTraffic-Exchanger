@@ -81,10 +81,14 @@ namespace WebTraffic_Exchanger.Views
 
                     var obj = (Proxy)ProxyGrid.Items[x];
                     WinInetInterop.SetConnectionProxy(obj.proxy);
-
+                    current = 0;
                     for (int i = 0; i < WebsiteGrid.Items.Count; i++)
                     {
-                        current = 0;
+                        while ( proxybrowsers.Count >= max_window)
+                        {                            
+                            System.Windows.Forms.Application.DoEvents();
+                        }
+
                         finished = false;
                         this.Dispatcher.Invoke(() =>
                         {
