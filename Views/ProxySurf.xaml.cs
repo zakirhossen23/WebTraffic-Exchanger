@@ -52,8 +52,6 @@ namespace WebTraffic_Exchanger.Views
 
         private async void SurfBTN_Click(object sender, RoutedEventArgs e)
         {
-            //reg_key = Registry.CurrentUser.OpenSubKey("Software\\Microsoft\\Windows\\CurrentVersion\\Internet Settings", true);
-            // reg_key.SetValue("ProxyEnable", 1);
             SurfBTN.IsEnabled = false;
             StopSurfBTN.IsEnabled = true;
 
@@ -78,16 +76,10 @@ namespace WebTraffic_Exchanger.Views
                     }
 
                     var obj = (Proxy)ProxyGrid.Items[x];
-                    //reg_key.SetValue("ProxyServer", obj.proxy);
                     WinInetInterop.SetConnectionProxy(obj.proxy);
 
                     for (int i = 0; i < WebsiteGrid.Items.Count; i++)
                     {
-                        #region "//******Browser"
-                        //webBrowser.ScriptErrorsSuppressed = true;
-                        //System.Windows.Forms.WebBrowser webBrowser = new System.Windows.Forms.WebBrowser();
-                        //webBrowser.Url = new Uri(((Website)WebsiteGrid.Items[i]).Name);
-                        #endregion
                         current = 0;
                         finished = false;
                         this.Dispatcher.Invoke(() =>
@@ -182,6 +174,21 @@ namespace WebTraffic_Exchanger.Views
             work_thread.Suspend();
             StopSurfBTN.IsEnabled = false;
             SurfBTN.IsEnabled = true;
+        }
+
+        private async void ReadWebsiteBTN_Click(object sender, RoutedEventArgs e)
+        {
+            var ofd = new System.Windows.Forms.OpenFileDialog();
+            ofd.ShowDialog();
+            using (System.IO.StreamReader SR = new System.IO.StreamReader(ofd.FileName))
+            {
+                string line = String.Empty;
+
+                while ((line = SR.ReadLine()) != null && line != "")
+                {
+                    WebsiteGrid.Items.Add(new Website() { ID = WebsiteGrid.Items.Count, Name = line.Trim() });
+                }
+            }
         }
     }
     class Website
