@@ -24,15 +24,15 @@ namespace WebTraffic_Exchanger.Main
         {
             InitializeComponent();
             GetUser();
-           
+
         }
         private async void GetUser()
         {
             classes.GetPost getpost = new classes.GetPost();
-            var parsed = await getpost.GetbyQuery("http://webtraffic.live/api/user?id=" + Properties.Settings.Default.Authid );
-             user = new Datas.User(parsed);
+            var parsed = await getpost.GetbyQuery("http://webtraffic.live/api/user?id=" + Properties.Settings.Default.Authid);
+            user = new Datas.User(parsed);
 
-            this.DataContext = new TextboxText() { username = user.username, credits =  user.credits, userlevel  = user.userlevel == 0?"Hidden":"Visible"};
+            this.DataContext = new TextboxText() { username = user.username, credits = user.credits, userlevel = user.userlevel == 0 ? "Hidden" : "Visible" };
         }
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
@@ -62,7 +62,7 @@ namespace WebTraffic_Exchanger.Main
         {
             Properties.Settings.Default.logged = false;
             Properties.Settings.Default.Save();
-            var w = Application.Current.Windows[0]; 
+            var w = Application.Current.Windows[0];
             this.Close();
             w.Show();
         }

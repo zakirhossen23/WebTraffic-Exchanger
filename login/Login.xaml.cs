@@ -24,7 +24,7 @@ namespace WebTraffic_Exchanger.login
     /// </summary>
     public partial class Login : Page
     {
-       
+
         public Login()
         {
             if (Properties.Settings.Default.logged == true)
@@ -48,19 +48,19 @@ namespace WebTraffic_Exchanger.login
         {
             try
             {
- classes.GetPost getpost = new classes.GetPost();
-            var parsed = await getpost.Post("{\n\t\"email\":\""+ usernameTXT.Text+ "\",\n\t\"password\":\""+ passwordTXT.Password + "\"\n\t\n}", "http://webtraffic.live/api/login");
-            int authid = int.Parse(parsed.SelectToken("id").ToString());
-            Properties.Settings.Default.Authid = authid;
-            Properties.Settings.Default.logged = true;
+                classes.GetPost getpost = new classes.GetPost();
+                var parsed = await getpost.Post("{\n\t\"email\":\"" + usernameTXT.Text + "\",\n\t\"password\":\"" + passwordTXT.Password + "\"\n\t\n}", "http://webtraffic.live/api/login");
+                int authid = int.Parse(parsed.SelectToken("id").ToString());
+                Properties.Settings.Default.Authid = authid;
+                Properties.Settings.Default.logged = true;
 
-            Properties.Settings.Default.Save();
+                Properties.Settings.Default.Save();
                 CloseAndMain();
             }
             catch (Exception ex)
             {
 
-            }          
+            }
 
         }
 

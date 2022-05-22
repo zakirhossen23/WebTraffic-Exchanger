@@ -66,19 +66,19 @@ namespace WebTraffic_Exchanger.Views
             }
             else
             {
-            browsing = new Browser.browserWin();
-            browsing.Show(website.url);
+                browsing = new Browser.browserWin();
+                browsing.Show(website.url);
             }
 
             surfTimer = new Timer();
             surfTimer.Interval = 1000;
-            surfTimer.Elapsed += (sender,e)=>keepSurfing(website);
+            surfTimer.Elapsed += (sender, e) => keepSurfing(website);
             surfTimer.Start();
         }
 
         private async void keepSurfing(Datas.Website website)
         {
-           
+
             if (website.duration > 1)
             {
                 website.duration -= 1;
@@ -91,18 +91,18 @@ namespace WebTraffic_Exchanger.Views
             {
                 classes.GetPost getpost = new classes.GetPost();
                 //Finished surf 1 website
-                 this.Dispatcher.Invoke(() => 
-                {  
-                    this.timeleft.Text ="0";                 
-                });
-                    var saved = await getpost.Post("{\n\t\"complete\":1,\n\t\"userid\": "+Properties.Settings.Default.Authid+",\n\t\"id\":"+website.id+"\n}", "http://webtraffic.live/api/session");
+                this.Dispatcher.Invoke(() =>
+               {
+                   this.timeleft.Text = "0";
+               });
+                var saved = await getpost.Post("{\n\t\"complete\":1,\n\t\"userid\": " + Properties.Settings.Default.Authid + ",\n\t\"id\":" + website.id + "\n}", "http://webtraffic.live/api/session");
                 this.Dispatcher.Invoke(() =>
                 {
                     earnedTXT.Text = String.Format("+{0} credit(s)!", website.credits.ToString());
                     showEarnedTXT.IsChecked = false;
                     showEarnedTXT.IsChecked = true;
                 });
-              
+
 
                 surfTimer.Close();
                 openWindow(true);
@@ -113,7 +113,7 @@ namespace WebTraffic_Exchanger.Views
             try
             {
                 if (browsing.closed)
-                {                    
+                {
                     surfTimer.Close();
                     timer.Close();
                     MessageBox.Show("Closed window!");
@@ -126,7 +126,7 @@ namespace WebTraffic_Exchanger.Views
                 }
             }
             catch (Exception ex) { }
-          
+
         }
 
     }

@@ -16,18 +16,19 @@ namespace WebTraffic_Exchanger.classes
             //"{\n\t\"email\":\"zakiristesting@gmail.com\",\n\t\"password\":\"zakir%%$\"\n\t\n}"
             var json = body;
             var data = new StringContent(json, Encoding.UTF8, "application/json");
-                       
+
             using (var client = new HttpClient())
             {
                 var response = await client.PostAsync(url, data);
                 string result = response.Content.ReadAsStringAsync().Result;
 
                 JToken parsed = null;
-                    try
+                try
                 {
-                    parsed= JObject.Parse(result);
-                return parsed;
-                }catch(Exception ex) { }
+                    parsed = JObject.Parse(result);
+                    return parsed;
+                }
+                catch (Exception ex) { }
                 return parsed;
 
 
@@ -37,7 +38,7 @@ namespace WebTraffic_Exchanger.classes
 
         public async Task<JToken> GetbyQuery(String url)
         {
-         
+
             using (var client = new HttpClient())
             {
                 var response = await client.GetAsync(url);

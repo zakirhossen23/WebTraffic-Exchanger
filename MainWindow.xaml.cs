@@ -33,7 +33,7 @@ namespace WebTraffic_Exchanger
             login.Login loginPage = new login.Login();
             Mainframe.Navigate(loginPage);
         }
-     
+
     }
 
 

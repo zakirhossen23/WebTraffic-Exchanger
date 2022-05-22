@@ -7,8 +7,8 @@
     xmlns:local="clr-namespace:WebTraffic_Exchanger.Main"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="WebTraffic Exchanger"
-    Width="800"
-    Height="450"
+    Width="1200"
+    Height="600"
     Closing="Window_Closing"
     WindowStartupLocation="CenterScreen"
     mc:Ignorable="d">
@@ -119,6 +119,7 @@
                                 </hc:SideMenuItem.Icon>
 
                             </hc:SideMenuItem>
+                           
 
                         </hc:SideMenu>
                     </StackPanel>

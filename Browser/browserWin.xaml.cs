@@ -23,7 +23,7 @@ namespace WebTraffic_Exchanger.Browser
         public browserWin()
         {
             InitializeComponent();
-               
+
         }
 
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
@@ -35,13 +35,13 @@ namespace WebTraffic_Exchanger.Browser
         {
             this.Dispatcher.Invoke(() =>
             {
-                this.wbMain.Address=( url);
+                this.wbMain.Address = (url);
             });
-            
+
         }
         public void Show(String url)
         {
-            this.wbMain.Address =( url);
+            this.wbMain.Address = (url);
             this.Show();
         }
 

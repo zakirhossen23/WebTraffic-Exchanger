@@ -26,7 +26,7 @@ namespace WebTraffic_Exchanger.Datas
         public String username { get; set; }
         public float credits { get; set; }
         public int slots { get; set; }
-    
+
         public int userlevel { get; set; }
 
     }

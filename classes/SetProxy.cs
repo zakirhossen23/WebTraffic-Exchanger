@@ -61,9 +61,9 @@ namespace SetProxy
         }
         private const int INTERNET_OPEN_TYPE_DIRECT = 1;  // direct to net
         private const int INTERNET_OPEN_TYPE_PRECONFIG = 0; // read registry
-                                                            /// <summary>
-                                                            /// Constants used in INTERNET_PER_CONN_OPTON struct.
-                                                            /// </summary>
+        /// <summary>
+        /// Constants used in INTERNET_PER_CONN_OPTON struct.
+        /// </summary>
         private enum INTERNET_OPTION_PER_CONN_FLAGS
         {
             PROXY_TYPE_DIRECT = 0x00000001,   // direct to net
