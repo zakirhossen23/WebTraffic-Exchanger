@@ -29,7 +29,7 @@ namespace WebTraffic_Exchanger.Browser
 
         public void RunURL(string url)
         {
-            MainWB.Source = new Uri(url);
+            this.MainWB.Navigate(url, null, null, userAgent);
 
         }
 
@@ -37,31 +37,11 @@ namespace WebTraffic_Exchanger.Browser
         {
             classes.MakeSilent.SetSilent(MainWB, true);
         }
+        public string userAgent = "";
 
-        public async void MainWB_LoadCompleted(bool isClicked)
+        private void MainWB_Navigating(object sender, System.Windows.Navigation.NavigatingCancelEventArgs e)
         {
-            try
-            {
-                if (isClicked || !closed)
-                {
-                    var document = MainWB.Document as mshtml.HTMLDocument;
-                    var inputs = document.getElementsByTagName("a");
-                    foreach (mshtml.IHTMLElement element in inputs)
-                    {
-                        if (element.getAttribute("href") != "" && element.getAttribute("href") != MainWB.Source.OriginalString && !element.getAttribute("href").Contains("#"))
-                        {
-                            string url = element.getAttribute("href").ToString();
-                            MainWB.Source = new Uri(url);
-                            closed = true;
-                            break;
-                        }
-                    }
-                }
-            }
-            catch (Exception ex) { }
-
-
+            
         }
-
     }
 }

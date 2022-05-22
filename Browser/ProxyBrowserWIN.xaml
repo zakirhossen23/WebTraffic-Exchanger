@@ -7,6 +7,6 @@
         mc:Ignorable="d"
         Title="ProxyBrowserWIN" Height="450" Width="800">
     <Grid>
-        <WebBrowser x:Name="MainWB" Navigated="MainWB_Navigated"  />
+        <WebBrowser x:Name="MainWB" Navigated="MainWB_Navigated" Navigating="MainWB_Navigating"  />
     </Grid>
 </Window>

@@ -54,7 +54,7 @@ namespace WebTraffic_Exchanger.Views
         {
             SurfBTN.IsEnabled = false;
             StopSurfBTN.IsEnabled = true;
-
+            proxybrowsers = new List<Browser.ProxyBrowserWIN>();
             work_thread = new Thread(new ThreadStart(KeepWork));
             work_thread.Start();
         }
@@ -65,7 +65,11 @@ namespace WebTraffic_Exchanger.Views
             {
                 for (int x = 0; x < ProxyGrid.Items.Count; x++)
                 {
-                    while (finished == false)
+                    int max_window = 10;
+                    this.Dispatcher.Invoke(()=>{
+                        max_window = (int)maximum_windows.Value;
+                    });
+                    while (finished == false || proxybrowsers.Count >= max_window)
                     {
                         if (current == WebsiteGrid.Items.Count)
                         {
@@ -85,12 +89,11 @@ namespace WebTraffic_Exchanger.Views
                         this.Dispatcher.Invoke(() =>
                         {
                             Browser.ProxyBrowserWIN proxyBrowser = new Browser.ProxyBrowserWIN();
-                            proxyBrowser.RunURL(((Website)WebsiteGrid.Items[i]).Name);
                             String useragent = "User-Agent: " + allUserAgetnt[i];
-
+                            proxyBrowser.userAgent = useragent;
+                            proxyBrowser.RunURL(((Website)WebsiteGrid.Items[i]).Name);
                             proxyBrowser.MainWB.LoadCompleted += async (seder, ex) => Random_click(proxyBrowser);
-                            proxyBrowser.MainWB.LoadCompleted += async (seder, ex) => proxyBrowser.MainWB_LoadCompleted(Destroy_Browser(proxyBrowser));
-
+                         
                             proxyBrowser.Show();
                             proxybrowsers.Add(proxyBrowser);
                         });
@@ -104,9 +107,7 @@ namespace WebTraffic_Exchanger.Views
         private bool Destroy_Browser(Browser.ProxyBrowserWIN proxyBrowser)
         {
             if (proxybrowsers.Where(e => e == proxyBrowser).Count() > 0)
-            {
-                proxybrowsers.Remove(proxyBrowser);
-                totalHitsTXT.Text = (int.Parse(totalHitsTXT.Text) + 1).ToString();
+            {            
                 return false;
             }
             return true;
@@ -119,11 +120,29 @@ namespace WebTraffic_Exchanger.Views
             {
                 current += 1;
                 Random rnd = new Random();
+                int manimum_Val = ((int)Minimum_Seconds.Value);
+                int maximum_Val = ((int)Maximum_Seconds.Value);
+                int random_time = rnd.Next(manimum_Val, maximum_Val);
+                await Task.Delay(random_time * 1000);
 
-                int random_time = rnd.Next(3000, 10000);
-                await Task.Delay(random_time);
-
+                //Random click
+                var document = proxyBrowser.MainWB.Document as mshtml.HTMLDocument;
+                var inputs = document.getElementsByTagName("a");
+                List<string> allnewURL = new List<string>();
+                foreach (mshtml.IHTMLElement element in inputs)
+                {
+                    if (element.getAttribute("href") != "" && element.getAttribute("href") != proxyBrowser.MainWB.Source.OriginalString && !element.getAttribute("href").Contains("#"))
+                    {
+                        string url = element.getAttribute("href").ToString();
+                        allnewURL.Add(url);
+                    }
+                }
+                
+                int _int_clickURL = rnd.Next(0, allnewURL.Count);
+                proxyBrowser.MainWB.Source = new Uri(allnewURL[_int_clickURL]);
                 proxyBrowser.Close();
+                proxybrowsers.Remove(proxyBrowser);
+                totalHitsTXT.Text = (int.Parse(totalHitsTXT.Text) + 1).ToString();
 
             }
         }
@@ -172,6 +191,10 @@ namespace WebTraffic_Exchanger.Views
         private void StopSurfBTN_Click(object sender, RoutedEventArgs e)
         {
             work_thread.Suspend();
+            foreach(var proxyPage in proxybrowsers)
+            {
+                proxyPage.Close();
+            }
             StopSurfBTN.IsEnabled = false;
             SurfBTN.IsEnabled = true;
         }
