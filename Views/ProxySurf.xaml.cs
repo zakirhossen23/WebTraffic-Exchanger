@@ -23,6 +23,11 @@ using Microsoft.Win32;
 using System.Threading;
 using System.Reflection;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Xml;
+using ICSharpCode.SharpZipLib.Zip;
+using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium;
 
 namespace WebTraffic_Exchanger.Views
 {
@@ -34,12 +39,19 @@ namespace WebTraffic_Exchanger.Views
             InitializeComponent();
         }
 
+        #region "Setting value of chrome"
+        String crhomeversion = "";
+        IWebDriver driver;
+        int height = Screen.AllScreens[0].WorkingArea.Height / 2;
+        int width = Screen.AllScreens[0].WorkingArea.Width / 2;
+        #endregion
+
         //RegistryKey reg_key;
         int current = 0;
         bool finished = true;
-        List<Browser.ProxyBrowserWIN> proxybrowsers = new List<Browser.ProxyBrowserWIN>();
+        List<string> browserHandalers = new List<string>();
+        List<IWebDriver> browserDriver = new List<IWebDriver>();
         System.Threading.Thread work_thread;
-        List<string> allUserAgetnt = new List<string>();
 
         //XML decode
         public List<string> RetrieveValuesForAttribute(XDocument doc, string attributeName)
@@ -49,16 +61,83 @@ namespace WebTraffic_Exchanger.Views
                            .Select(x => x.Value)
                            .ToList();
         }
+        private void UpdateAndOpenDriver(string proxy)
+        {
+            bool update = false;
+            while (true)
+            {
+                #region  "Driver Opening"
+                if (update == true)
+                {
+                    object path = Registry.GetValue(@"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe", "", null);
+                    object path2 = Registry.GetValue(@"HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe", "", null);
+                    if (path != null)
+                        crhomeversion = FileVersionInfo.GetVersionInfo(path.ToString()).FileVersion;
+                    if (path2 != null)
+                        crhomeversion = FileVersionInfo.GetVersionInfo(path2.ToString()).FileVersion; ;
+                    string GetListxml = "";
+
+                    using (WebClient client = new WebClient()) // WebClient class inherits IDisposable
+                    {
+                        string url = "https://chromedriver.storage.googleapis.com/?delimiter=/&prefix=";
+                        GetListxml = client.DownloadString(String.Format("{0}{1}", url, crhomeversion.Split('.')[0]));
+                    }
+                    XmlDocument doc = new XmlDocument();
+                    doc.LoadXml(GetListxml);
+                    string ChromeDriverVersion = "";
+                    foreach (XmlNode node in doc.DocumentElement.ChildNodes)
+                    {
+                        if (node.InnerText.Contains(String.Format("{0}.", crhomeversion.Split('.')[0])))
+                        {
+                            ChromeDriverVersion = node.InnerText; //or loop through its children as well
+                            break;
+                        }
+                    }
+                    WebClient webClient = new WebClient();
+                    webClient.Headers.Add("Accept: text/html, application/xhtml+xml, */*");
+                    webClient.Headers.Add("User-Agent: Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0)");
+                    webClient.DownloadFile(new Uri(String.Format("https://chromedriver.storage.googleapis.com/{0}chromedriver_win32.zip", ChromeDriverVersion)), "chromedriver_win32.zip");
+
+                    System.Windows.Forms.MessageBox.Show("Close all the chromedriver.exe from Taskbar to continue!");
+
+                    var zipFileName = String.Format("{0}\\{1}", System.Windows.Forms.Application.StartupPath, "chromedriver_win32.zip");
+                    var targetDir = String.Format("{0}\\chromedriver", System.Windows.Forms.Application.StartupPath);
+                    FastZip fastZip = new FastZip();
+                    string fileFilter = null;
+
+                    // Will always overwrite if target filenames already exist
+                    fastZip.ExtractZip(zipFileName, targetDir, fileFilter);
+                }
+
+                try
+                {
+                    var chromeDriverService = ChromeDriverService.CreateDefaultService("./chromedriver");
+                    chromeDriverService.HideCommandPromptWindow = true;
+                    ChromeOptions chromeOptions = new ChromeOptions();
+                    string arg = String.Format("--window-size={0},{1} --proxy-server={2}", width.ToString(), height.ToString(), proxy);
+                    chromeOptions.AddArgument(arg);
+                    driver = new ChromeDriver(chromeDriverService, chromeOptions);
+                    driver.Manage().Window.Position = new System.Drawing.Point(width, 0);
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    update = true;
+                    continue;
+                }
+                #endregion
+            }
+        }
 
         private async void SurfBTN_Click(object sender, RoutedEventArgs e)
         {
             SurfBTN.IsEnabled = false;
             StopSurfBTN.IsEnabled = true;
-            proxybrowsers = new List<Browser.ProxyBrowserWIN>();
+            browserHandalers = new List<string>();
             work_thread = new Thread(new ThreadStart(KeepWork));
             work_thread.Start();
         }
-
+        bool isworking = false;
         private async void KeepWork()
         {
             while (true)
@@ -66,10 +145,11 @@ namespace WebTraffic_Exchanger.Views
                 for (int x = 0; x < ProxyGrid.Items.Count; x++)
                 {
                     int max_window = 10;
-                    this.Dispatcher.Invoke(()=>{
+                    this.Dispatcher.Invoke(() =>
+                    {
                         max_window = (int)maximum_windows.Value;
                     });
-                    while (finished == false || proxybrowsers.Count >= max_window)
+                    while (finished == false || browserHandalers.Count >= max_window)
                     {
                         if (current == WebsiteGrid.Items.Count)
                         {
@@ -78,29 +158,55 @@ namespace WebTraffic_Exchanger.Views
                         }
                         System.Windows.Forms.Application.DoEvents();
                     }
-
                     var obj = (Proxy)ProxyGrid.Items[x];
-                    WinInetInterop.SetConnectionProxy(obj.proxy);
+                    this.Dispatcher.Invoke(() =>
+                    {
+                        UpdateAndOpenDriver(obj.proxy);
+                    });
+                   
+                    browserDriver.Add(driver);
                     current = 0;
                     for (int i = 0; i < WebsiteGrid.Items.Count; i++)
                     {
-                        while ( proxybrowsers.Count >= max_window)
-                        {                            
+                        while (browserHandalers.Count >= max_window)
+                        {
                             System.Windows.Forms.Application.DoEvents();
                         }
 
                         finished = false;
-                        this.Dispatcher.Invoke(() =>
+
+                        if (i != 0)
                         {
-                            Browser.ProxyBrowserWIN proxyBrowser = new Browser.ProxyBrowserWIN();
-                            String useragent = "User-Agent: " + allUserAgetnt[i];
-                            proxyBrowser.userAgent = useragent;
-                            proxyBrowser.RunURL(((Website)WebsiteGrid.Items[i]).Name);
-                            proxyBrowser.MainWB.LoadCompleted += async (seder, ex) => Random_click(proxyBrowser);
-                         
-                            proxyBrowser.Show();
-                            proxybrowsers.Add(proxyBrowser);
-                        });
+                            ((IJavaScriptExecutor)driver).ExecuteScript("window.open();");
+                            driver.SwitchTo().Window(driver.WindowHandles.Last());
+                        }
+                        while (true)
+                        {
+                            try
+                            {
+                                while (isworking)
+                                {
+                                   System.Windows.Forms.Application.DoEvents();
+                                }
+                                this.Dispatcher.Invoke(() =>
+                                {
+                                    isworking = true;
+                                    driver.Navigate().GoToUrl(((Website)WebsiteGrid.Items[i]).Name);
+
+                                    Thread thread = new Thread(async (seder) => Random_click(driver.CurrentWindowHandle, driver));
+                                    thread.Start();
+                                    browserHandalers.Add(driver.CurrentWindowHandle);
+                                    isworking = false;
+                                });
+                                break;
+                            }
+                            catch (Exception)
+                            {
+                                continue;
+                            }
+                        }
+
+
 
                     }
                 }
@@ -108,46 +214,53 @@ namespace WebTraffic_Exchanger.Views
         }
 
 
-        private bool Destroy_Browser(Browser.ProxyBrowserWIN proxyBrowser)
+        private bool Destroy_Browser(string handaller)
         {
-            if (proxybrowsers.Where(e => e == proxyBrowser).Count() > 0)
-            {            
+            if (browserHandalers.Where(e => e == handaller).Count() > 0)
+            {
                 return false;
             }
             return true;
 
         }
-        private async void Random_click(Browser.ProxyBrowserWIN proxyBrowser)
+        private async void Random_click(string current_Handaler, IWebDriver driver)
         {
 
-            if (!Destroy_Browser(proxyBrowser))
+            if (!Destroy_Browser(current_Handaler))
             {
                 current += 1;
                 Random rnd = new Random();
-                int manimum_Val = ((int)Minimum_Seconds.Value);
-                int maximum_Val = ((int)Maximum_Seconds.Value);
+                int manimum_Val = 0; int maximum_Val = 0;
+                this.Dispatcher.Invoke(() =>
+                {
+                    manimum_Val = ((int)Minimum_Seconds.Value);
+
+                    maximum_Val = ((int)Maximum_Seconds.Value);
+                });
                 int random_time = rnd.Next(manimum_Val, maximum_Val);
                 await Task.Delay(random_time * 1000);
 
                 //Random click
-                var document = proxyBrowser.MainWB.Document as mshtml.HTMLDocument;
-                var inputs = document.getElementsByTagName("a");
+                driver.SwitchTo().Window(current_Handaler);
+                List<IWebElement> allLinks = driver.FindElements(By.TagName("a")).ToList();
+
                 List<string> allnewURL = new List<string>();
-                foreach (mshtml.IHTMLElement element in inputs)
+                foreach (IWebElement element in allLinks)
                 {
-                    if (element.getAttribute("href") != "" && element.getAttribute("href") != proxyBrowser.MainWB.Source.OriginalString && !element.getAttribute("href").Contains("#"))
+                    if (element.GetAttribute("href") != "" && element.GetAttribute("href") != driver.Url && !element.GetAttribute("href").Contains("#"))
                     {
-                        string url = element.getAttribute("href").ToString();
+                        string url = element.GetAttribute("href").ToString();
                         allnewURL.Add(url);
                     }
                 }
-                
-                int _int_clickURL = rnd.Next(0, allnewURL.Count);
-                proxyBrowser.MainWB.Source = new Uri(allnewURL[_int_clickURL]);
-                proxyBrowser.Close();
-                proxybrowsers.Remove(proxyBrowser);
-                totalHitsTXT.Text = (int.Parse(totalHitsTXT.Text) + 1).ToString();
-
+                this.Dispatcher.Invoke(() =>
+                {
+                    int _int_clickURL = rnd.Next(0, allnewURL.Count);
+                    driver.Navigate().GoToUrl(allnewURL[_int_clickURL]);
+                    driver.Close();
+                    browserHandalers.Remove(current_Handaler);
+                    totalHitsTXT.Text = (int.Parse(totalHitsTXT.Text) + 1).ToString();
+                });
             }
         }
 
@@ -167,11 +280,6 @@ namespace WebTraffic_Exchanger.Views
         {
             LoadProxyBTN.IsEnabled = false;
 
-            //UserAgent
-            var client = new WebClient();
-            string xml = await client.DownloadStringTaskAsync("https://techpatterns.com/downloads/firefox/useragentswitcher.xml");
-            XDocument doc = XDocument.Parse(xml);
-            allUserAgetnt = RetrieveValuesForAttribute(doc, "useragent");
 
             //Proxies
             var url = "https://api.proxyscrape.com/v2/account/datacenter_shared/proxy-list?auth=exrabwwjri9qbck50dqn&type=getproxies&country[]=all&protocol=http&format=normal&status=online";
@@ -195,10 +303,7 @@ namespace WebTraffic_Exchanger.Views
         private void StopSurfBTN_Click(object sender, RoutedEventArgs e)
         {
             work_thread.Suspend();
-            foreach(var proxyPage in proxybrowsers)
-            {
-                proxyPage.Close();
-            }
+            driver.Quit();
             StopSurfBTN.IsEnabled = false;
             SurfBTN.IsEnabled = true;
         }
