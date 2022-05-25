@@ -46,6 +46,31 @@ namespace WebTraffic_Exchanger.Views
         int width = Screen.AllScreens[0].WorkingArea.Width / 2;
         #endregion
 
+        #region "Waiting"
+        bool isDriverWorking = false;
+
+        private async Task waitUntilDriver(int waittype)
+        {
+            while (isDriverWorking == true)
+            {
+                System.Windows.Forms.Application.DoEvents();
+                if (waittype ==2)
+                await Task.Delay(500);
+                else await Task.Delay(300);
+            }
+            isDriverWorking = true;
+        }
+        #endregion
+
+
+
+        public void changeStatus(string status)
+        {
+            Main.Main myWindow = (Main.Main)System.Windows.Application.Current.Windows[1];
+
+            myWindow.statusTXT.Text = status;
+        }
+
         //RegistryKey reg_key;
         int current = 0;
         bool finished = true;
@@ -131,13 +156,13 @@ namespace WebTraffic_Exchanger.Views
 
         private async void SurfBTN_Click(object sender, RoutedEventArgs e)
         {
+            changeStatus("Statring...");
             SurfBTN.IsEnabled = false;
             StopSurfBTN.IsEnabled = true;
             browserHandalers = new List<string>();
             work_thread = new Thread(new ThreadStart(KeepWork));
             work_thread.Start();
         }
-        bool isworking = false;
         private async void KeepWork()
         {
             while (true)
@@ -161,22 +186,26 @@ namespace WebTraffic_Exchanger.Views
                     var obj = (Proxy)ProxyGrid.Items[x];
                     this.Dispatcher.Invoke(() =>
                     {
+                        changeStatus(String.Format("Opening chrome as {0} proxy", obj.proxy));
                         UpdateAndOpenDriver(obj.proxy);
                     });
-                   
+
                     browserDriver.Add(driver);
                     current = 0;
                     for (int i = 0; i < WebsiteGrid.Items.Count; i++)
                     {
                         while (browserHandalers.Count >= max_window)
                         {
+                            await Task.Delay(TimeSpan.FromSeconds(10));
                             System.Windows.Forms.Application.DoEvents();
                         }
 
                         finished = false;
+                        await waitUntilDriver(1);
 
                         if (i != 0)
                         {
+                            driver.SwitchTo().Window(driver.WindowHandles[0]);
                             ((IJavaScriptExecutor)driver).ExecuteScript("window.open();");
                             driver.SwitchTo().Window(driver.WindowHandles.Last());
                         }
@@ -184,20 +213,19 @@ namespace WebTraffic_Exchanger.Views
                         {
                             try
                             {
-                                while (isworking)
-                                {
-                                   System.Windows.Forms.Application.DoEvents();
-                                }
+
                                 this.Dispatcher.Invoke(() =>
                                 {
-                                    isworking = true;
-                                    driver.Navigate().GoToUrl(((Website)WebsiteGrid.Items[i]).Name);
+                                    string goingURL = ((Website)WebsiteGrid.Items[i]).Name;
+                                    changeStatus(String.Format("Going to {0}", goingURL));
+                                    driver.Navigate().GoToUrl(goingURL);
+                                    changeStatus(String.Format("Gone!"));
 
                                     Thread thread = new Thread(async (seder) => Random_click(driver.CurrentWindowHandle, driver));
                                     thread.Start();
                                     browserHandalers.Add(driver.CurrentWindowHandle);
-                                    isworking = false;
                                 });
+                                isDriverWorking = false;
                                 break;
                             }
                             catch (Exception)
@@ -216,51 +244,85 @@ namespace WebTraffic_Exchanger.Views
 
         private bool Destroy_Browser(string handaller)
         {
-            if (browserHandalers.Where(e => e == handaller).Count() > 0)
+            try
             {
-                return false;
+                if (browserHandalers.Where(e => e == handaller).Count() > 0)
+                {
+                    return false;
+                }
             }
+            catch (Exception)
+            {
+            }
+
             return true;
 
         }
-        private async void Random_click(string current_Handaler, IWebDriver driver)
+        private async void Random_click(string current_Handaler, IWebDriver driver2)
         {
 
             if (!Destroy_Browser(current_Handaler))
             {
-                current += 1;
+
                 Random rnd = new Random();
                 int manimum_Val = 0; int maximum_Val = 0;
                 this.Dispatcher.Invoke(() =>
                 {
                     manimum_Val = ((int)Minimum_Seconds.Value);
-
                     maximum_Val = ((int)Maximum_Seconds.Value);
+                    changeStatus(String.Format("Going to wait for Random time."));
                 });
                 int random_time = rnd.Next(manimum_Val, maximum_Val);
                 await Task.Delay(random_time * 1000);
 
+                await waitUntilDriver(2);
                 //Random click
                 driver.SwitchTo().Window(current_Handaler);
+
                 List<IWebElement> allLinks = driver.FindElements(By.TagName("a")).ToList();
 
                 List<string> allnewURL = new List<string>();
                 foreach (IWebElement element in allLinks)
                 {
-                    if (element.GetAttribute("href") != "" && element.GetAttribute("href") != driver.Url && !element.GetAttribute("href").Contains("#"))
+                    try
                     {
-                        string url = element.GetAttribute("href").ToString();
-                        allnewURL.Add(url);
+                        string urlLink = element.GetAttribute("href");
+                        string currentURL = driver2.Url;
+                        if (urlLink != "" && urlLink != currentURL && !urlLink.Contains("#"))
+                        {
+                            string url = element.GetAttribute("href").ToString();
+                            allnewURL.Add(url);
+                        }
+
+                    }
+                    catch (Exception)
+                    {
+
                     }
                 }
                 this.Dispatcher.Invoke(() =>
                 {
-                    int _int_clickURL = rnd.Next(0, allnewURL.Count);
-                    driver.Navigate().GoToUrl(allnewURL[_int_clickURL]);
-                    driver.Close();
+                    changeStatus(String.Format("Clicking!"));
+                    if (allnewURL.Count > 0)
+                    {
+                        int _int_clickURL = rnd.Next(0, allnewURL.Count);
+                        driver.Navigate().GoToUrl(allnewURL[_int_clickURL]);
+                    }
+
                     browserHandalers.Remove(current_Handaler);
+                    if (driver.WindowHandles.Count == 1)
+                    {
+                        ((IJavaScriptExecutor)driver).ExecuteScript("window.open();");
+                    }
+                    driver.Close();
                     totalHitsTXT.Text = (int.Parse(totalHitsTXT.Text) + 1).ToString();
+                    changeStatus(String.Format("Clicked!"));
                 });
+                current += 1;
+                isDriverWorking = false;
+                Thread.CurrentThread.Abort();
+                return;
+
             }
         }
 
@@ -404,3 +466,4 @@ namespace WebTraffic_Exchanger.Views
 
 
 }
+

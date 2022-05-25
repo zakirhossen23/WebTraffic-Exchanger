@@ -22,7 +22,7 @@
                 <RowDefinition Height="50" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <StackPanel>
+            <Grid >
                 <ToggleButton
                     Grid.Row="0"
                     Grid.Column="0"
@@ -34,7 +34,9 @@
                     Content="&#xE700;"
                     FontFamily="Segoe MDL2 Assets"
                     IsChecked="{Binding IsOpen, ElementName=DrawerLeft}" />
-            </StackPanel>
+                <TextBlock  Grid.Row="0" HorizontalAlignment="Center" Name="statusTXT" VerticalAlignment="Center" TextWrapping="Wrap" Text="Status"/>
+
+            </Grid>
 
             <Frame
                 Name="PagesFrames"
