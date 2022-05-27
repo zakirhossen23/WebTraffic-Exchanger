@@ -169,7 +169,7 @@
                     Grid.Column="0"
                     BorderThickness="1"
                     GridLinesVisibility="All">
-
+                 
                     <DataGrid.Columns>
                         <DataGridTextColumn
                             MinWidth="50"
